@@ -8,9 +8,12 @@ let id;
 
 window.onload = function() {
 
-	if(filter == "all"){
+	if(filter == "all" || filter == null){
+		localStorage.setItem('filter', 'all');
 		library = jsonConfig.movies;
 	}
+
+	console.log(filter);
 
 	populate();
 
