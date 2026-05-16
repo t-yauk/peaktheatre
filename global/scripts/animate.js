@@ -1,3 +1,4 @@
+setTimeout(function() {
 (()=>{
 	"use strict";
 	!function(){
@@ -66,3 +67,4 @@
 		}))
 	}()
 })();
+}, 100);
