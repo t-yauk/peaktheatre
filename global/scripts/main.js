@@ -14,7 +14,7 @@ function populate() {
 
 		const newItem = document.createElement('div');
 		newItem.classList.add("apple-tv-card-container");
-		newItem.innerHTML = "<div class='apple-tv-card'><a class='content' style=\"background-image:url('" + library[i].previewImage + "');\"></a><div class='parallax-content'><div class='content-wrapper'><span class='title'>" + library[i].title + "</span></div></div>";
+		newItem.innerHTML = "<div class='apple-tv-card'><a class='content'></a><div class='parallax-content'><div class='content-wrapper'><span class='title'>" + library[i].title + "</span></div></div>";
 		container.appendChild(newItem);
 
 	}
