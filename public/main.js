@@ -18,7 +18,7 @@ async function checkLocalNetwork() {
 		});
     
 		clearTimeout(id);
-			//window.location.href = "http://192.168.2.165";
+		window.location.href = "http://192.168.2.165";
 		return true;
 	} catch (error) {
 		console.log("Device is NOT connected to the local network.");
