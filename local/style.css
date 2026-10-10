@@ -31,6 +31,10 @@ body {
     width: 50%;
 }
 
+#tv .logo img{
+    width: 80%;
+}
+
 .main-menu{
     display: block;
     margin-top: 50px;
@@ -56,6 +60,10 @@ body {
 .main-menu-item:hover, .main-menu-item.active{
     background: white;
     color: #32444f;
+}
+
+.main-menu-item.return{
+    display: none;
 }
 
 
@@ -225,18 +233,35 @@ body {
 
 
 
-.library-wrapper{
+.library-wrapper, .episode-wrapper{
     position: relative;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    height: 100vh;
-    overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
     &::-webkit-scrollbar {
         display: none;
     }
+}
+
+.episode-wrapper{
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+.library-wrapper{
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+#tv .library-wrapper, #tv .show-wrapper{
+    display: none;
+}
+
+#tv .library-wrapper.active, #tv .show-wrapper.active{
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .library-item{
@@ -253,6 +278,10 @@ body {
 
 .library-item:nth-child(-n+5){
     margin-top: 12vh;
+}
+
+#tv .library-item:nth-child(-n+5){
+    margin-top: 3vh;
 }
 
 .library-item:nth-child(5n){
@@ -296,6 +325,10 @@ body {
     z-index: 10;
 }*/
 
+.episode-wrapper .episode-item{
+    background: white;
+}
+
 
 
 .loading{
@@ -335,4 +368,138 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.show-details{
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 4vh;
+    margin-bottom: 25px;
+}
+
+.show-details #show-thumbnail{
+    display: inline-block;
+    width: calc(17% - 25px);
+    aspect-ratio: 1/1.5;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 25px;
+}
+
+.show-details .details{
+    display: inline-block;
+    width: 83%;
+    text-align: left;
+}
+
+.show-details .details img{
+    width: 500px;
+}
+
+.show-details .details p{
+    display: block;
+    font-size: 1.1875rem;
+    line-height: 1.825rem;
+    letter-spacing: .2px;
+    color: white;
+}
+
+.episode-container{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80000px;
+    height: 100%;
+}
+
+.episode-item{
+    display: inline-block;
+    width: 25vw;
+    height: 100%;
+    border-radius: 15px;
+    background: white;
+    filter: drop-shadow(0 0 0.4rem rgba(0,0,0,0));
+    margin-right: 30px;
+    vertical-align: top;
+    cursor: pointer;
+    transition: filter 0.5s ease;
+}
+
+.episode-item:hover{
+    filter: drop-shadow(0 0 0.4rem rgba(0,0,0,0.8));
+}
+
+.episode-item .top{
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    aspect-ratio: 4/3;
+    max-height: 250px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px 15px 0px 0px;
+    overflow: hidden;
+}
+
+.episode-item .top .overlay{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image:linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0));
+    z-index: 1;
+}
+
+.episode-item .top .title{
+    position: relative;
+    display: block;
+    padding: 20px;
+    font-size: 1.325rem;
+    line-height: 1;
+    font-weight: 550;
+    color: white;
+    filter: drop-shadow(0 0 0.4rem rgba(0,0,0,0.2));
+    z-index: 2;
+}
+
+.episode-item .description{
+    display: block;
+    font-size: 0.9rem;
+    padding: 0px 20px 20px 20px;
+}
+
+.season-wrapper{
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.season-item{
+    display: inline-block;
+    padding: 12px 15px;
+    font-size: 1.325rem;
+    line-height: 1;
+    font-weight: 400;
+    border: solid 1.5px white;
+    border-radius: 10px;
+    color: white;
+    margin-left: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.season-item:hover, .season-item.active{
+    background: white;
+    color: #192329;
+}
+
+.season-item:first-child{
+    margin-left: 0px;
+}
+
+.season-item:last-child{
+    margin-right: 0px;
 }
