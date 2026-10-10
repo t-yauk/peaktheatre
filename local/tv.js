@@ -1,21 +1,25 @@
 import jsonConfig from 'https://t-yauk.github.io/peak-theatre/tv/the-library.json' with {type: "json"};
 
-const container = (document.getElementsByClassName("library"))[0];
-const episodeContainer = (document.getElementsByClassName("library"))[1];
+const container = (document.getElementsByClassName("library-wrapper"))[0];
+const episodeContainer = (document.getElementsByClassName("episode-container"))[0];
+const episodeWrapper = (document.getElementsByClassName("episode-wrapper"))[0];
 const seasonContainer = (document.getElementsByClassName("season-wrapper"))[0];
 const details = (document.getElementsByClassName("details"))[0];
 const returnHome = document.getElementById("homelink");
+const showContainer = (document.getElementsByClassName("show-wrapper"))[0];
+const showDetails = (document.getElementsByClassName("show-details"))[0];
+const returnButton = document.querySelector(".main-menu-item.return");
+const loading = (document.getElementsByClassName("loading"))[0];
 
 const data = jsonConfig.shows;
 let library = [];
 let episodes;
-let id;
+let allEpisodes;
+let id = 6;
 let seasons = [];
-let season;
+let i;
 
 const wrapper = document.querySelector('.episodes');
-const originalTop = episodeContainer.scrollTop;
-const originalLeft = episodeContainer.scrollLeft;
 
 window.onload = function() {
 
@@ -39,7 +43,7 @@ async function getData() {
 
 async function populate() {
 
-    for(let i=0;i<library.length;i++){
+    for(i=0;i<library.length;i++){
         const newItem = document.createElement('div');
         newItem.classList.add("library-item");
         newItem.id = i;
@@ -47,18 +51,13 @@ async function populate() {
         container.appendChild(newItem);
     }
 
-    const initalElement = (document.getElementsByClassName("library-item"))[0];
-    const offsetWidth = initalElement.offsetWidth;
-
-    const width = (((offsetWidth + 50) * library.length) + 50);
-
-    container.style.width = `${width}px`;
-
     const items = document.querySelectorAll('.library-item');
 	items.forEach(element => {
 		element.addEventListener('click', function(event) {
             id = Number(this.id);
-			populateDetails();
+            container.classList.remove("active");
+            episodeContainer.innerHTML = "";
+			populateShow();
   		});
 	});
 
@@ -66,117 +65,115 @@ async function populate() {
 
 
 
-function populateDetails() {
+function populateShow() {
 
-    document.getElementById("artwork").src = `../elements/tv/artwork/${library[id].image_url}`;
-    document.getElementById("logo").src = `../elements/tv/logos/${library[id].logo}`;
+    document.getElementById("show-thumbnail").src = `../elements/tv/thumbnails/${data[id].image}`;
+    document.getElementById("show-logo").src = `../elements/tv/logos/${library[id].logo}`;
     document.getElementById("description").innerHTML = library[id].description;
+
+    showContainer.classList.add("active");
+    returnButton.style.display = "block";
+
+    const offset = showDetails.offsetHeight + 25;
+
+    episodeWrapper.style.height = `calc(90vh - ${offset}px)`;
+
+    allEpisodes = library[id].episodes;
 
     episodes = library[id].episodes;
 
-    populateEpisodes();
-
-    details.classList.add("active");
-
-    populateSeasons();
+    findSeasons();
 
 }
 
-function populateEpisodes() {
-    for(let i=0;i<episodes.length;i++){
+async function findSeasons() {
 
-        let description;
-
-        if((episodes[i].description).length > 370){
-            description = (episodes[i].description).slice(0, 370);
-            description += "...";
-        }else{
-            description = episodes[i].description;
-        }
-
-        const newItem = document.createElement('div');
-        newItem.classList.add("episode-item");
-
-        for(let e=0;e<(library[id].episodes).length;e++){
-            if(episodes[i].title == library[id].episodes[e].title){
-                newItem.id = e;
-                break;
-            }
-        }
-        
-        newItem.innerHTML = `<img src="${episodes[i].thumbnail}"><div class="episode-details"><span class="title">${episodes[i].episode_number}. ${episodes[i].title}</span><p class="description">${description}</p></div>`;
-        episodeContainer.appendChild(newItem);
-    }
-
-    const width = ((550 * episodes.length) + 50);
-
-    episodeContainer.style.width = `${width}px`;
-
-    const items = document.querySelectorAll('.episode-item');
-	items.forEach(element => {
-		element.addEventListener('click', function(event) {
-            const url = `/tv/watch?s=${id}&e=${this.id}`;
-            window.location.href = url;
-        });
-    });
-}
-
-function populateSeasons() {
-
-    for(let i=0;i<episodes.length;i++){
-        if (!seasons.includes(episodes[i].season)) {
-            seasons.push(episodes[i].season)
+    for(i=0;i<allEpisodes.length;i++){
+        if (!seasons.includes(allEpisodes[i].season)) {
+            seasons.push(allEpisodes[i].season);
         }
     }
 
     if(seasons.length > 1){
-        for(let s=0;s<seasons.length;s++){
-            const newItem = document.createElement('div');
-            newItem.classList.add("season-item");
-            if(seasons.length > 5){
-                newItem.classList.add("small");
-            }
-            newItem.innerHTML = `Season ${seasons[s]}`;
-            seasonContainer.appendChild(newItem);
+        await populateSeasons();
+    }
+
+    populateEpisodes();
+
+}
+
+function populateSeasons() {
+
+    for(i=0;i<seasons.length;i++){
+        const newItem = document.createElement('div');
+        newItem.classList.add("season-item");
+        if(seasons.length > 6){
+            newItem.style.fontSize = "1.3rem";
         }
+        newItem.innerHTML = `Season ${seasons[i]}`;
+        seasonContainer.appendChild(newItem);
     }
 
     const items = document.querySelectorAll('.season-item');
 	items.forEach(element => {
 		element.addEventListener('click', function(event) {
-
-            for(let i=0;i<items.length;i++){
-                items[i].classList.remove("active");
+            for(let s=0;s<items.length;s++){
+                items[s].classList.remove("active");
             }
-
             this.classList.add("active");
-
-            const raw = this.innerHTML;
-            season = raw.replace("Season ", "");
+            let season = this.innerHTML;
+            season = season.replace("Season ", "");
+            episodeContainer.innerHTML = "";
             episodes = [];
-            for(let i=0;i<(library[id].episodes).length;i++){
-                if(library[id].episodes[i].season == season){
-                    episodes.push(library[id].episodes[i]);
+            for(i=0;i<allEpisodes.length;i++){
+                if(allEpisodes[i].season == season){
+                    episodes.push(allEpisodes[i]);
                 }
             }
-            wrapper.scrollTo({
-                top: originalTop,
-                left: originalLeft,
-                behavior: 'smooth'
-            });
-            episodeContainer.innerHTML = "";
-            episodeContainer.style.width = "0px";
+            episodeWrapper.scrollTo(0,0);
             populateEpisodes();
   		});
 	});
 
 }
 
+function populateEpisodes() {
 
-returnHome.addEventListener('click', function(event){
-    details.classList.remove("active");
-    episodes = [];
-    seasons = [];
+    for(i=0;i<episodes.length;i++){
+        const newItem = document.createElement('div');
+        newItem.classList.add("episode-item");
+        newItem.id = i;
+        newItem.innerHTML = `<div class="top" style="background-image:url('${episodes[i].thumbnail}')"><div class="overlay"></div><span class="title">${episodes[i].episode_number}. ${episodes[i].title}</span></div><p class="description">${episodes[i].description}</p>`;
+        episodeContainer.appendChild(newItem);
+    };
+
+    const element = (document.getElementsByClassName("episode-item"))[0];
+    const elementWidth = element.offsetWidth + 30;
+    
+    episodeContainer.style.width = `${elementWidth * episodes.length}px`;
+
+    const items = document.querySelectorAll('.episode-item');
+	items.forEach(element => {
+		element.addEventListener('click', function(event) {
+            let epID = Number(this.id);
+            for(i=0;i<allEpisodes.length;i++){
+                if(allEpisodes[i].title == episodes[epID].title){
+                    epID = i;
+                    const url = `/tv/watch?s=${id}&e=${epID}`;
+                    loading.classList.add("active");
+                    window.location.href = url;
+                }
+            }
+  		});
+	});
+
+}
+
+returnButton.addEventListener("click", (event) => {
+    episodeWrapper.scrollTo(0, 0);
+    container.classList.add("active");
+    showContainer.classList.remove("active");
+    returnButton.style.display = "none";
     seasonContainer.innerHTML = "";
-    episodeContainer.innerHTML = "";
+    seasons = [];
 });
